@@ -1,0 +1,25 @@
+# Бизнес-контекст живёт уровнем выше (../.business/), здесь ничего не ожидаем.
+# Защита от случайного сабмодуля.
+.business/
+
+# Vendored Claude skills — установленные сторонние пакеты, не наш код.
+.claude/skills/
+
+# OS / editor noise
+.DS_Store
+*.swp
+*~
+
+# IDE
+.vscode/
+.idea/
+
+# Логи
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Локальные тестовые файлы (см. session 2026-04-26-hello-test)
+HELLO.md
