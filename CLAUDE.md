@@ -108,7 +108,24 @@ cd ~/Projects/toward-perfection/website/app
 
 `.railwayignore` в `app/` исключает `node_modules/`, `.next/`, `.env*` — без него `railway up` пытается грузить ~700 МБ и таймаутится.
 
-> ⚠️ **Локально нет git-репозитория.** Деплой идёт через `railway up` напрямую. Это работает, но любой откат возможен только через Railway UI (Deployments → Restore). На будущее имеет смысл подключить GitHub-репо для истории и auto-deploy.
+## Git
+
+Репозиторий: **git@github.com:TemaUdjin/toward-perfection-website.git** (приватный).
+
+Корень репо — `website/` (этот файл лежит в нём). `app/` — Next-приложение внутри. Бизнес-контекст из `../.business/` **не** входит в этот репо.
+
+Стандартный цикл:
+```bash
+cd ~/Projects/toward-perfection/website
+git status
+git add <files>
+git commit -m "..."
+git push
+```
+
+Откат: `git revert <sha>` или восстановление файла `git checkout <sha> -- <file>`.
+
+> ⚠️ **Auto-deploy от GitHub пока не подключён.** Railway деплоит через CLI (`railway up`). Чтобы push → deploy: Railway dashboard → handstand-web → Settings → Source → "Connect Repo" → выбрать `TemaUdjin/toward-perfection-website`, root directory `app`, branch `main`. После этого `railway up` больше не нужен.
 
 ## Правила работы
 
