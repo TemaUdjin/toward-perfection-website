@@ -124,11 +124,15 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
   )
 }
 
-function CtaLink() {
+function CtaLink({ white = false }: { white?: boolean }) {
   return (
-    <Link href="/auth" className="inline-flex items-center gap-3 group">
+    <Link href="/auth" className={`inline-flex items-center gap-3 group ${white ? 'text-white' : ''}`}>
       <span className="text-sm font-semibold tracking-widest uppercase">Start Practice</span>
-      <span className="w-10 h-10 rounded-full border border-[var(--foreground)] flex items-center justify-center group-hover:bg-[var(--foreground)] group-hover:text-[var(--background)] transition-all">
+      <span className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
+        white
+          ? 'border-white group-hover:bg-white group-hover:text-black'
+          : 'border-[var(--foreground)] group-hover:bg-[var(--foreground)] group-hover:text-[var(--background)]'
+      }`}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <line x1="5" y1="12" x2="19" y2="12" />
           <polyline points="12 5 19 12 12 19" />
@@ -204,7 +208,7 @@ function HeroOverlay() {
           A system of conscious body control.<br />
           Strength. Mobility. Awareness.
         </p>
-        <CtaLink />
+        <CtaLink white />
       </div>
     </section>
   )
