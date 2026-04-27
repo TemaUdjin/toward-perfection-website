@@ -55,7 +55,8 @@ Next.js 16 (Turbopack, App Router) · React 19 · TypeScript · Tailwind 4 · Su
 ## Текущее состояние
 
 - Phase 1 MVP задеплоен на Railway
-- Готовы: Landing, Auth, Dashboard, Course/[slug] с LessonPlayer
+- Готовы: Landing (с AI-upscaled hero video), Auth, Dashboard, Course/[slug] с LessonPlayer
+- Hero секция: `hero-ai.mp4` (RealESRGAN_x4plus, 1080×1920) — autoplay на iOS и десктопе
 - Supabase подключён (URL + anon key в `.env.local`)
 - DB схема ещё не подтверждена
 
@@ -68,7 +69,8 @@ Next.js 16 (Turbopack, App Router) · React 19 · TypeScript · Tailwind 4 · Su
 2. Подключение **Paddle** для оплаты подписки (после ИП)
 3. DB схема Supabase: users, progress, lessons
 4. Съёмка видео для уровня Foundation
-5. Добавить видео с перформансом тренера на лендинг
+5. ~~Добавить видео с перформансом тренера на лендинг~~ **ГОТОВО** — `hero-ai.mp4` (RealESRGAN AI upscale, 1080×1920)
+6. Зарегистрировать домен **towardperfection.co** и подключить к Railway
 
 ## Команды
 

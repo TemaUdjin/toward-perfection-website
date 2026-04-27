@@ -11,18 +11,23 @@
 - [x] Фаза 5. Настроить GitHub auto-deploy через Railway. Починить `rootDirectory=app` через GraphQL API (`serviceInstanceUpdate`). Проверка: push → прод за 54-90 сек.
 - [x] Фаза 6. Починить autoplay на десктопе — добавить `canplay` event listener + `preload="auto"` + `volume=0`.
 - [x] Фаза 7. Починить CTA кнопку в светлой теме — `<CtaLink white />` в HeroOverlay, всегда белый цвет независимо от темы.
-- [ ] Фаза 8. AI Upscale через Real-ESRGAN — **В ПРОЦЕССЕ** (запущено 2026-04-27 ~23:08 +07).
+- [x] Фаза 8. AI Upscale через Real-ESRGAN — **ЗАВЕРШЕНО** (23:08 → 01:01 +07, ~2 часа).
   - Модель: `RealESRGAN_x4plus`, PyTorch 2.8 + MPS (Apple Silicon)
   - Вход: `hero.mp4` (608×1080, 741 кадр)
-  - Выход: `hero-ai.mp4` (апскейл 4x → даунскейл до 1080×1920, CRF 18)
-  - Скрипт: `/tmp/upscale_hero.py`
-  - Автодеплой: `/tmp/autodeploy.sh` (nohup, PID 11043) — ждёт Done! в логе, потом git push
-  - Лог upscaling: `/tmp/upscale_log.txt`
-  - Лог автодеплоя: `/tmp/upscale_deploy.log`
+  - Выход: `hero-ai.mp4` (апскейл 4x → даунскейл до 1080×1920, CRF 18, 39 МБ)
+  - Автодеплой сработал в 01:01 — git push → Railway → прод
+  - Результат: **потрясающе выглядит**, утверждено
 
 ## Итог
 
-Фазы 1-7 завершены. Фаза 8 (AI upscale) выполняется в фоне — результат будет задеплоен автоматически.
+Реализовано целиком. Hero-секция полностью завершена для мобильных и десктопа.
+
+**Финальное состояние:**
+- Видео: `hero-ai.mp4` (AI upscale RealESRGAN, 1080×1920, 39 МБ)
+- Постер: `hero-poster.jpg` (кадр 21.94с, для Low Power Mode)
+- Autoplay: работает на iOS и десктопе (canplay listener + MPS)
+- CTA кнопка: белая в overlay независимо от темы
+- Dev-варианты: `/?v=a` (Split+hero2.mp4), `/?v=none` (Text)
 
 ## Файлы, которые изменились
 
