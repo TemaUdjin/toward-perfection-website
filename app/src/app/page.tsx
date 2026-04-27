@@ -1,51 +1,50 @@
 import Link from 'next/link'
 import { Nav } from '@/components/Nav'
 
-export default function LandingPage() {
+type SearchParams = Promise<{ v?: string }>
+
+const VARIANTS = [
+  { k: 'none', label: 'Text' },
+  { k: 'a', label: 'Split' },
+  { k: 'b', label: 'Overlay' },
+] as const
+
+export default async function LandingPage({ searchParams }: { searchParams: SearchParams }) {
+  const { v } = await searchParams
+  const variant: 'none' | 'a' | 'b' = v === 'none' ? 'none' : v === 'a' ? 'a' : 'b'
+
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <Nav />
 
-      {/* Hero */}
-      <section className="min-h-screen flex flex-col justify-center px-6 pt-24 pb-16">
-        <div className="max-w-5xl mx-auto w-full text-center">
-          <p className="text-[var(--accent)] text-xs font-semibold tracking-[0.3em] uppercase mb-12">
-            A practice system
-          </p>
-          <h1 className="text-[clamp(2.75rem,8.5vw,6.75rem)] font-bold leading-[0.92] tracking-[-0.03em] mb-10">
-            Toward<br />
-            <span className="text-[var(--accent)]">Perfection</span>
-          </h1>
-          <p className="text-base sm:text-lg text-[var(--muted-foreground)] max-w-lg mx-auto leading-relaxed mb-12">
-            A system of conscious body control.<br />
-            Strength. Mobility. Awareness.
-          </p>
+      <div className="fixed top-20 right-4 z-50 flex gap-1 rounded-full border border-[var(--border)] bg-[var(--background)]/80 backdrop-blur p-1 text-xs">
+        {VARIANTS.map((opt) => (
           <Link
-            href="/auth"
-            className="inline-flex items-center gap-3 group"
+            key={opt.k}
+            href={opt.k === 'none' ? '/' : `/?v=${opt.k}`}
+            className={`px-3 py-1 rounded-full transition ${
+              variant === opt.k
+                ? 'bg-[var(--accent)] text-black'
+                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+            }`}
           >
-            <span className="text-sm font-semibold tracking-widest uppercase">Start Practice</span>
-            <span className="w-10 h-10 rounded-full border border-[var(--foreground)] flex items-center justify-center group-hover:bg-[var(--foreground)] group-hover:text-[var(--background)] transition-all">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </span>
+            {opt.label}
           </Link>
-        </div>
-      </section>
+        ))}
+      </div>
 
-      {/* Divider */}
+      {variant === 'a' && <HeroSplit />}
+      {variant === 'b' && <HeroOverlay />}
+      {variant === 'none' && <HeroText />}
+
       <div className="border-t border-[var(--border)]" />
 
-      {/* How It Works */}
       <section className="px-6 py-32">
         <div className="max-w-5xl mx-auto text-center">
           <p className="text-[var(--accent)] text-xs font-semibold tracking-[0.3em] uppercase mb-20">
             How it works
           </p>
 
-          {/* Stages */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[var(--border)] mb-24">
             {[
               { n: '01', label: 'Challenge', desc: 'You meet resistance. The body reveals what the mind avoids.' },
@@ -60,7 +59,6 @@ export default function LandingPage() {
             ))}
           </div>
 
-          {/* Elements */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
             {['Length', 'Tension', 'Breath', 'Release'].map((el, i) => (
               <div key={el} className="flex flex-col items-center gap-3">
@@ -74,10 +72,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Divider */}
       <div className="border-t border-[var(--border)]" />
 
-      {/* Experience */}
       <section className="px-6 py-32">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-[var(--accent)] text-xs font-semibold tracking-[0.3em] uppercase mb-10">
@@ -102,32 +98,18 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Divider */}
       <div className="border-t border-[var(--border)]" />
 
-      {/* Final CTA */}
       <section className="px-6 py-32 text-center">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-[clamp(2rem,5.5vw,4.5rem)] font-bold leading-[0.92] tracking-[-0.03em] mb-10">
             Begin<br />
             <span className="text-[var(--accent)]">when ready.</span>
           </h2>
-          <Link
-            href="/auth"
-            className="inline-flex items-center gap-3 group"
-          >
-            <span className="text-sm font-semibold tracking-widest uppercase">Start Practice</span>
-            <span className="w-10 h-10 rounded-full border border-[var(--foreground)] flex items-center justify-center group-hover:bg-[var(--foreground)] group-hover:text-[var(--background)] transition-all">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </span>
-          </Link>
+          <CtaLink />
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-[var(--border)] px-6 py-8">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <span className="text-xs font-semibold tracking-widest uppercase text-[var(--accent)]">
@@ -137,5 +119,106 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
+  )
+}
+
+function CtaLink() {
+  return (
+    <Link href="/auth" className="inline-flex items-center gap-3 group">
+      <span className="text-sm font-semibold tracking-widest uppercase">Start Practice</span>
+      <span className="w-10 h-10 rounded-full border border-[var(--foreground)] flex items-center justify-center group-hover:bg-[var(--foreground)] group-hover:text-[var(--background)] transition-all">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <polyline points="12 5 19 12 12 19" />
+        </svg>
+      </span>
+    </Link>
+  )
+}
+
+function HeroText() {
+  return (
+    <section className="min-h-screen flex flex-col justify-center px-6 pt-24 pb-16">
+      <div className="max-w-5xl mx-auto w-full text-center">
+        <p className="text-[var(--accent)] text-xs font-semibold tracking-[0.3em] uppercase mb-12">
+          A practice system
+        </p>
+        <h1 className="text-[clamp(2.75rem,8.5vw,6.75rem)] font-bold leading-[0.92] tracking-[-0.03em] mb-10">
+          Toward<br />
+          <span className="text-[var(--accent)]">Perfection</span>
+        </h1>
+        <p className="text-base sm:text-lg text-[var(--muted-foreground)] max-w-lg mx-auto leading-relaxed mb-12">
+          A system of conscious body control.<br />
+          Strength. Mobility. Awareness.
+        </p>
+        <CtaLink />
+      </div>
+    </section>
+  )
+}
+
+function HeroSplit() {
+  return (
+    <section className="relative grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+      <div className="relative w-full h-[60vh] lg:h-screen bg-black overflow-hidden lg:order-2">
+        <video
+          src="/hero.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </div>
+
+      <div className="flex flex-col justify-center px-6 sm:px-12 lg:px-16 xl:px-24 py-16 lg:py-0 lg:order-1">
+        <div className="max-w-lg mx-auto lg:mx-0 text-center lg:text-left">
+          <p className="text-[var(--accent)] text-xs font-semibold tracking-[0.3em] uppercase mb-10">
+            A practice system
+          </p>
+          <h1 className="text-[clamp(2.5rem,5.5vw,4.75rem)] font-bold leading-[0.95] tracking-[-0.03em] mb-8">
+            Toward<br />
+            <span className="text-[var(--accent)]">Perfection</span>
+          </h1>
+          <p className="text-base sm:text-lg text-[var(--muted-foreground)] leading-relaxed mb-12">
+            A system of conscious body control.<br />
+            Strength. Mobility. Awareness.
+          </p>
+          <CtaLink />
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function HeroOverlay() {
+  return (
+    <section className="relative min-h-screen flex flex-col justify-center px-6 pt-24 pb-16 overflow-hidden">
+      <video
+        src="/hero.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden
+        className="absolute inset-0 m-auto h-full w-auto max-w-none pointer-events-none"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/85 pointer-events-none" />
+
+      <div className="relative max-w-5xl mx-auto w-full text-center">
+        <p className="text-[var(--accent)] text-[13px] sm:text-xs font-semibold tracking-[0.3em] uppercase mb-10 sm:mb-12">
+          A practice system
+        </p>
+        <h1 className="text-[clamp(3.25rem,12vw,8rem)] font-bold leading-[0.92] tracking-[-0.03em] mb-8 sm:mb-10 text-white drop-shadow-[0_2px_32px_rgba(0,0,0,0.7)]">
+          Toward<br />
+          <span className="text-[var(--accent)]">Perfection</span>
+        </h1>
+        <p className="text-base sm:text-lg text-white/90 max-w-lg mx-auto leading-relaxed mb-12">
+          A system of conscious body control.<br />
+          Strength. Mobility. Awareness.
+        </p>
+        <CtaLink />
+      </div>
+    </section>
   )
 }
