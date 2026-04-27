@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Nav } from '@/components/Nav'
+import { HeroVideo } from '@/components/HeroVideo'
 
 type SearchParams = Promise<{ v?: string }>
 
@@ -194,15 +195,7 @@ function HeroSplit() {
 function HeroOverlay() {
   return (
     <section className="relative min-h-screen flex flex-col justify-center px-6 pt-24 pb-16 overflow-hidden">
-      <video
-        src="/hero.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-        aria-hidden
-        className="absolute inset-0 m-auto h-full w-auto max-w-none pointer-events-none"
-      />
+      <HeroVideo />
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/85 pointer-events-none" />
 
       <div className="relative max-w-5xl mx-auto w-full text-center">
