@@ -8,7 +8,7 @@ interface Props {
   className?: string
 }
 
-export function HeroVideo({ src = '/hero.mp4', poster = '/hero-poster.jpg', className = '' }: Props) {
+export function HeroVideo({ src = '/hero-ai.mp4', poster = '/hero-poster.jpg', className = '' }: Props) {
   const ref = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
