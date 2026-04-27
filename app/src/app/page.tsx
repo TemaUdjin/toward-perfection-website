@@ -193,7 +193,7 @@ function HeroSplit() {
 function HeroOverlay() {
   return (
     <section className="relative min-h-screen flex flex-col justify-center px-6 pt-24 pb-16 overflow-hidden">
-      <HeroVideo className="lg:blur-[2px] lg:scale-110 lg:brightness-90" />
+      <HeroVideo />
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/85 pointer-events-none" />
 
       <div className="relative max-w-5xl mx-auto w-full text-center">
