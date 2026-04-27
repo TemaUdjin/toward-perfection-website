@@ -5,9 +5,10 @@ import { useEffect, useRef } from 'react'
 interface Props {
   src?: string
   poster?: string
+  className?: string
 }
 
-export function HeroVideo({ src = '/hero.mp4', poster }: Props) {
+export function HeroVideo({ src = '/hero-hq.mp4', poster = '/hero-poster.jpg', className = '' }: Props) {
   const ref = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export function HeroVideo({ src = '/hero.mp4', poster }: Props) {
       playsInline
       aria-hidden
       preload="auto"
-      className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+      className={`absolute inset-0 w-full h-full object-cover pointer-events-none ${className}`}
     />
   )
 }

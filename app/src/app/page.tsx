@@ -12,8 +12,8 @@ const VARIANTS = [
 
 export default async function LandingPage({ searchParams }: { searchParams: SearchParams }) {
   const { v } = await searchParams
-  const variant: 'none' | 'a' | 'b' | 'responsive' =
-    v === 'none' ? 'none' : v === 'a' ? 'a' : v === 'b' ? 'b' : 'responsive'
+  const variant: 'none' | 'a' | 'b' =
+    v === 'none' ? 'none' : v === 'a' ? 'a' : 'b'
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
@@ -35,12 +35,6 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
         ))}
       </div>
 
-      {variant === 'responsive' && (
-        <>
-          <div className="lg:hidden"><HeroOverlay /></div>
-          <div className="hidden lg:flex"><HeroSplit /></div>
-        </>
-      )}
       {variant === 'a' && <HeroSplit />}
       {variant === 'b' && <HeroOverlay />}
       {variant === 'none' && <HeroText />}
@@ -195,7 +189,7 @@ function HeroSplit() {
 function HeroOverlay() {
   return (
     <section className="relative min-h-screen flex flex-col justify-center px-6 pt-24 pb-16 overflow-hidden">
-      <HeroVideo poster="/hero-poster.jpg" />
+      <HeroVideo className="lg:blur-[2px] lg:scale-110 lg:brightness-90" />
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/85 pointer-events-none" />
 
       <div className="relative max-w-5xl mx-auto w-full text-center">
