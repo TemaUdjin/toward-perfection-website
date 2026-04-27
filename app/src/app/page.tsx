@@ -19,23 +19,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <Nav />
 
-      <div className="fixed top-20 right-4 z-50 flex gap-1 rounded-full border border-[var(--border)] bg-[var(--background)]/80 backdrop-blur p-1 text-xs">
-        {VARIANTS.map((opt) => (
-          <Link
-            key={opt.k}
-            href={opt.k === 'none' ? '/' : `/?v=${opt.k}`}
-            className={`px-3 py-1 rounded-full transition ${
-              variant === opt.k
-                ? 'bg-[var(--accent)] text-black'
-                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
-            }`}
-          >
-            {opt.label}
-          </Link>
-        ))}
-      </div>
-
-      {variant === 'a' && <HeroSplit />}
+{variant === 'a' && <HeroSplit />}
       {variant === 'b' && <HeroOverlay />}
       {variant === 'none' && <HeroText />}
 
