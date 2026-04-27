@@ -15,7 +15,15 @@ export function HeroVideo({ src = '/hero.mp4', poster = '/hero-poster.jpg', clas
     const v = ref.current
     if (!v) return
     v.muted = true
-    v.play().catch(() => {})
+    v.volume = 0
+
+    const play = () => { v.play().catch(() => {}) }
+
+    // Attempt immediately — works if browser pre-buffered
+    play()
+    // Fallback: retry when enough data is available
+    v.addEventListener('canplay', play, { once: true })
+    return () => v.removeEventListener('canplay', play)
   }, [])
 
   return (
@@ -28,7 +36,7 @@ export function HeroVideo({ src = '/hero.mp4', poster = '/hero-poster.jpg', clas
       loop
       playsInline
       aria-hidden
-      preload="metadata"
+      preload="auto"
       className={`absolute inset-0 w-full h-full object-cover pointer-events-none ${className}`}
     />
   )
