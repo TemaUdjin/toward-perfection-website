@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={geist.variable} data-deploy-check="2026-04-27-auto-2" suppressHydrationWarning>
+    <html lang="en" className={geist.variable} suppressHydrationWarning>
       <body className="min-h-screen">
         <ThemeProvider>{children}</ThemeProvider>
       </body>

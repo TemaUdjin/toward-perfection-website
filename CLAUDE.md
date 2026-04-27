@@ -125,7 +125,9 @@ git push
 
 Откат: `git revert <sha>` или восстановление файла `git checkout <sha> -- <file>`.
 
-> ⚠️ **Auto-deploy от GitHub пока не подключён.** Railway деплоит через CLI (`railway up`). Чтобы push → deploy: Railway dashboard → handstand-web → Settings → Source → "Connect Repo" → выбрать `TemaUdjin/toward-perfection-website`, root directory `app`, branch `main`. После этого `railway up` больше не нужен.
+**Auto-deploy включён.** `git push origin main` → Railway автоматически собирает и катит на прод (~60-90 секунд от push до live). Ручной `railway up` остаётся как fallback и для случаев, когда нужно деплойнуть незакоммиченное.
+
+Конфигурация: `rootDirectory=app`, builder автоопределяется по `app/Dockerfile`. Меняется через GraphQL (`serviceInstanceUpdate`) или Railway dashboard → Settings → Source.
 
 ## Правила работы
 
