@@ -2,7 +2,12 @@
 
 import { useEffect, useRef } from 'react'
 
-export function HeroVideo() {
+interface Props {
+  src?: string
+  poster?: string
+}
+
+export function HeroVideo({ src = '/hero.mp4', poster }: Props) {
   const ref = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -15,15 +20,15 @@ export function HeroVideo() {
   return (
     <video
       ref={ref}
-      src="/hero.mp4"
-      poster="/hero-poster.jpg"
+      src={src}
+      poster={poster}
       autoPlay
       muted
       loop
       playsInline
       aria-hidden
       preload="auto"
-      className="absolute inset-0 m-auto h-full w-auto max-w-none pointer-events-none"
+      className="absolute inset-0 w-full h-full object-cover pointer-events-none"
     />
   )
 }

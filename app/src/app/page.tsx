@@ -12,7 +12,8 @@ const VARIANTS = [
 
 export default async function LandingPage({ searchParams }: { searchParams: SearchParams }) {
   const { v } = await searchParams
-  const variant: 'none' | 'a' | 'b' = v === 'none' ? 'none' : v === 'a' ? 'a' : 'b'
+  const variant: 'none' | 'a' | 'b' | 'responsive' =
+    v === 'none' ? 'none' : v === 'a' ? 'a' : v === 'b' ? 'b' : 'responsive'
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
@@ -34,6 +35,12 @@ export default async function LandingPage({ searchParams }: { searchParams: Sear
         ))}
       </div>
 
+      {variant === 'responsive' && (
+        <>
+          <div className="lg:hidden"><HeroOverlay /></div>
+          <div className="hidden lg:flex"><HeroSplit /></div>
+        </>
+      )}
       {variant === 'a' && <HeroSplit />}
       {variant === 'b' && <HeroOverlay />}
       {variant === 'none' && <HeroText />}
@@ -160,33 +167,26 @@ function HeroText() {
 
 function HeroSplit() {
   return (
-    <section className="relative grid grid-cols-1 lg:grid-cols-2 min-h-screen">
-      <div className="relative w-full h-[60vh] lg:h-screen bg-black overflow-hidden lg:order-2">
-        <video
-          src="/hero.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+    <section className="grid grid-cols-2 min-h-screen">
+      {/* Left: text on dark bg */}
+      <div className="flex flex-col justify-center px-12 xl:px-20 bg-[var(--background)]">
+        <p className="text-[var(--accent)] text-xs font-semibold tracking-[0.3em] uppercase mb-10">
+          A practice system
+        </p>
+        <h1 className="text-[clamp(2.75rem,4.5vw,5.5rem)] font-bold leading-[0.92] tracking-[-0.03em] mb-8">
+          Toward<br />
+          <span className="text-[var(--accent)]">Perfection</span>
+        </h1>
+        <p className="text-base xl:text-lg text-[var(--muted-foreground)] leading-relaxed mb-12 max-w-sm">
+          A system of conscious body control.<br />
+          Strength. Mobility. Awareness.
+        </p>
+        <CtaLink />
       </div>
 
-      <div className="flex flex-col justify-center px-6 sm:px-12 lg:px-16 xl:px-24 py-16 lg:py-0 lg:order-1">
-        <div className="max-w-lg mx-auto lg:mx-0 text-center lg:text-left">
-          <p className="text-[var(--accent)] text-xs font-semibold tracking-[0.3em] uppercase mb-10">
-            A practice system
-          </p>
-          <h1 className="text-[clamp(2.5rem,5.5vw,4.75rem)] font-bold leading-[0.95] tracking-[-0.03em] mb-8">
-            Toward<br />
-            <span className="text-[var(--accent)]">Perfection</span>
-          </h1>
-          <p className="text-base sm:text-lg text-[var(--muted-foreground)] leading-relaxed mb-12">
-            A system of conscious body control.<br />
-            Strength. Mobility. Awareness.
-          </p>
-          <CtaLink />
-        </div>
+      {/* Right: horizontal video */}
+      <div className="relative overflow-hidden bg-black">
+        <HeroVideo src="/hero2.mp4" />
       </div>
     </section>
   )
@@ -195,7 +195,7 @@ function HeroSplit() {
 function HeroOverlay() {
   return (
     <section className="relative min-h-screen flex flex-col justify-center px-6 pt-24 pb-16 overflow-hidden">
-      <HeroVideo />
+      <HeroVideo poster="/hero-poster.jpg" />
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/85 pointer-events-none" />
 
       <div className="relative max-w-5xl mx-auto w-full text-center">
