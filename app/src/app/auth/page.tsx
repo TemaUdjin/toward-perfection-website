@@ -58,7 +58,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      <Nav minimal />
+      <Nav />
 
       <div className="flex min-h-screen items-center justify-center px-6 pt-16">
         <div className="w-full max-w-sm">

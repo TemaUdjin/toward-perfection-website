@@ -8,7 +8,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      <Nav minimal />
+      <Nav />
 
       <div className="max-w-4xl mx-auto px-6 pt-28 pb-24">
         {/* Header */}

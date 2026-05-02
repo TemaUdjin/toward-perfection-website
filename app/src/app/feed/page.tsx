@@ -45,7 +45,7 @@ export default async function FeedPage() {
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      <Nav loggedIn />
+      <Nav />
 
       <div className="max-w-2xl mx-auto px-6 pt-28 pb-24">
         <div className="mb-12">

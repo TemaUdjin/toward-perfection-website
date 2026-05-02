@@ -2,17 +2,38 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { ThemeToggle } from './ThemeToggle'
 import { createClient } from '@/lib/supabase/client'
 
-type NavProps = {
-  minimal?: boolean
-  loggedIn?: boolean
-}
-
-export function Nav({ minimal = false, loggedIn = false }: NavProps) {
+export function Nav() {
   const pathname = usePathname()
   const router = useRouter()
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [initial, setInitial] = useState('?')
+
+  useEffect(() => {
+    const supabase = createClient()
+
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      setLoggedIn(!!session)
+      if (session) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', session.user.id)
+          .single()
+        const name = data?.full_name?.trim()
+        setInitial(name ? name[0].toUpperCase() : session.user.email?.[0].toUpperCase() ?? '?')
+      }
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setLoggedIn(!!session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   async function handleSignOut() {
     const supabase = createClient()
@@ -24,7 +45,10 @@ export function Nav({ minimal = false, loggedIn = false }: NavProps) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[var(--border)] bg-[var(--background)]/80 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href={loggedIn ? '/feed' : '/'} className="text-xs tracking-widest uppercase text-[var(--foreground)]">
+        <Link
+          href={loggedIn ? '/feed' : '/'}
+          className="text-xs tracking-widest uppercase text-[var(--foreground)]"
+        >
           Toward Perfection
         </Link>
 
@@ -34,6 +58,13 @@ export function Nav({ minimal = false, loggedIn = false }: NavProps) {
               <NavLink href="/feed" current={pathname === '/feed'}>Feed</NavLink>
               <NavLink href="/dashboard" current={pathname === '/dashboard'}>Courses</NavLink>
               <NavLink href="/members" current={pathname === '/members'}>Members</NavLink>
+              <Link
+                href="/account"
+                className="w-7 h-7 rounded-full bg-[var(--muted)] border border-[var(--border)] flex items-center justify-center text-[10px] font-semibold text-[var(--muted-foreground)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors"
+                title="Account settings"
+              >
+                {initial}
+              </Link>
               <button
                 onClick={handleSignOut}
                 className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
@@ -41,7 +72,7 @@ export function Nav({ minimal = false, loggedIn = false }: NavProps) {
                 Sign out
               </button>
             </>
-          ) : !minimal ? (
+          ) : (
             <>
               <Link href="/course/foundation" className="text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors">
                 Course
@@ -50,7 +81,7 @@ export function Nav({ minimal = false, loggedIn = false }: NavProps) {
                 Sign in
               </Link>
             </>
-          ) : null}
+          )}
           <ThemeToggle />
         </div>
       </div>
@@ -58,7 +89,11 @@ export function Nav({ minimal = false, loggedIn = false }: NavProps) {
   )
 }
 
-function NavLink({ href, current, children }: { href: string; current: boolean; children: React.ReactNode }) {
+function NavLink({ href, current, children }: {
+  href: string
+  current: boolean
+  children: React.ReactNode
+}) {
   return (
     <Link
       href={href}

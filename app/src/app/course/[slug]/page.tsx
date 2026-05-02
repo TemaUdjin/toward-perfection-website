@@ -19,7 +19,7 @@ export default async function CoursePage({ params }: { params: Promise<{ slug: s
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      <Nav minimal />
+      <Nav />
 
       <div className="max-w-4xl mx-auto px-6 pt-28 pb-16">
         {/* Breadcrumb */}
