@@ -2,10 +2,13 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import Cropper from 'react-easy-crop'
+import type { Area } from 'react-easy-crop'
 import { createClient } from '@/lib/supabase/client'
+import { getCroppedBlob } from '@/lib/cropImage'
 import { Nav } from '@/components/Nav'
 
 type Profile = {
@@ -21,17 +24,19 @@ export default function AccountPage() {
 
   const [userId, setUserId] = useState('')
   const [profile, setProfile] = useState<Profile>({
-    full_name: '',
-    bio: '',
-    instagram_handle: '',
-    avatar_url: null,
+    full_name: '', bio: '', instagram_handle: '', avatar_url: null,
   })
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+
+  // Cropper state
+  const [cropSrc, setCropSrc] = useState<string | null>(null)
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
   const [avatarUploading, setAvatarUploading] = useState(false)
 
   const [profileLoading, setProfileLoading] = useState(false)
   const [profileMsg, setProfileMsg] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
-
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [passLoading, setPassLoading] = useState(false)
@@ -59,33 +64,46 @@ export default function AccountPage() {
     })
   }, [router])
 
-  async function handleAvatarSelect(e: React.ChangeEvent<HTMLInputElement>) {
+  // Open file picker → show cropper
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (!file || !userId) return
+    if (!file) return
+    const url = URL.createObjectURL(file)
+    setCropSrc(url)
+    setCrop({ x: 0, y: 0 })
+    setZoom(1)
+    // reset input so same file can be re-selected
+    e.target.value = ''
+  }
 
+  const onCropComplete = useCallback((_: Area, pixels: Area) => {
+    setCroppedAreaPixels(pixels)
+  }, [])
+
+  async function handleApplyCrop() {
+    if (!cropSrc || !croppedAreaPixels || !userId) return
     setAvatarUploading(true)
-    const objectUrl = URL.createObjectURL(file)
-    setAvatarPreview(objectUrl)
+    setCropSrc(null)
 
-    const supabase = createClient()
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(userId, file, { upsert: true, contentType: file.type })
+    try {
+      const blob = await getCroppedBlob(cropSrc, croppedAreaPixels)
+      const supabase = createClient()
+      const { error } = await supabase.storage
+        .from('avatars')
+        .upload(userId, blob, { upsert: true, contentType: 'image/jpeg' })
+      if (error) throw error
 
-    if (uploadError) {
-      setProfileMsg({ type: 'error', text: 'Avatar upload failed: ' + uploadError.message })
-      setAvatarPreview(profile.avatar_url)
+      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(userId)
+      const url = `${publicUrl}?t=${Date.now()}`
+      await supabase.from('profiles').update({ avatar_url: url }).eq('id', userId)
+      setAvatarPreview(url)
+      setProfile((p) => ({ ...p, avatar_url: url }))
+    } catch (err) {
+      setProfileMsg({ type: 'error', text: 'Upload failed. Try again.' })
+    } finally {
       setAvatarUploading(false)
-      return
+      URL.revokeObjectURL(cropSrc ?? '')
     }
-
-    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(userId)
-    const urlWithBust = `${publicUrl}?t=${Date.now()}`
-
-    await supabase.from('profiles').update({ avatar_url: urlWithBust }).eq('id', userId)
-    setProfile((p) => ({ ...p, avatar_url: urlWithBust }))
-    setAvatarPreview(urlWithBust)
-    setAvatarUploading(false)
   }
 
   async function handleSaveProfile(e: React.FormEvent) {
@@ -135,6 +153,66 @@ export default function AccountPage() {
     <div className="min-h-screen bg-[var(--background)]">
       <Nav />
 
+      {/* ── Crop modal ── */}
+      {cropSrc && (
+        <div className="fixed inset-0 z-[100] flex flex-col bg-black/90">
+          {/* Cropper area */}
+          <div className="relative flex-1">
+            <Cropper
+              image={cropSrc}
+              crop={crop}
+              zoom={zoom}
+              aspect={1}
+              cropShape="round"
+              showGrid={false}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={onCropComplete}
+            />
+          </div>
+
+          {/* Controls */}
+          <div className="flex-shrink-0 bg-black px-6 py-5 flex flex-col items-center gap-5">
+            {/* Zoom slider */}
+            <div className="flex items-center gap-4 w-full max-w-xs">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="opacity-50">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                type="range"
+                min={1}
+                max={3}
+                step={0.01}
+                value={zoom}
+                onChange={(e) => setZoom(Number(e.target.value))}
+                className="flex-1 accent-[#c8a96e]"
+              />
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                <line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
+              </svg>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-3 w-full max-w-xs">
+              <button
+                onClick={() => { setCropSrc(null); URL.revokeObjectURL(cropSrc) }}
+                className="flex-1 h-11 rounded-xl border border-white/20 text-sm text-white/70 hover:text-white hover:border-white/40 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleApplyCrop}
+                disabled={avatarUploading}
+                className="flex-1 h-11 rounded-xl bg-[#c8a96e] text-[#0a0a0a] text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {avatarUploading ? 'Uploading…' : 'Apply'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-lg mx-auto px-6 pt-28 pb-24">
         <div className="mb-12">
           <p className="text-[var(--accent)] text-xs font-semibold tracking-[0.3em] uppercase mb-3">
@@ -174,14 +252,15 @@ export default function AccountPage() {
             <div>
               <p className="text-sm font-medium mb-1">Profile photo</p>
               <p className="text-xs text-[var(--muted-foreground)]">JPG, PNG or WebP · max 2 MB</p>
+              <p className="text-xs text-[var(--muted-foreground)] mt-0.5">Drag to reposition, scroll to zoom</p>
             </div>
           </div>
           <input
             ref={fileRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
+            accept="image/jpeg,image/png,image/webp"
             className="hidden"
-            onChange={handleAvatarSelect}
+            onChange={handleFileSelect}
           />
         </section>
 
@@ -204,7 +283,6 @@ export default function AccountPage() {
                 className="w-full h-12 px-4 rounded-xl bg-[var(--muted)] border border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] text-sm focus:outline-none focus:border-[var(--accent)] transition-colors"
               />
             </div>
-
             <div>
               <label className="block text-xs text-[var(--muted-foreground)] uppercase tracking-wide mb-2">
                 Bio
@@ -221,7 +299,6 @@ export default function AccountPage() {
                 {profile.bio.length} / 300
               </p>
             </div>
-
             <div>
               <label className="block text-xs text-[var(--muted-foreground)] uppercase tracking-wide mb-2">
                 Instagram
@@ -238,13 +315,11 @@ export default function AccountPage() {
                 />
               </div>
             </div>
-
             {profileMsg && (
               <p className={`text-sm ${profileMsg.type === 'error' ? 'text-red-500' : 'text-green-500'}`}>
                 {profileMsg.text}
               </p>
             )}
-
             <button
               type="submit"
               disabled={profileLoading}
