@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { ThemeToggle } from './ThemeToggle'
 import { createClient } from '@/lib/supabase/client'
 
@@ -11,6 +12,7 @@ export function Nav() {
   const router = useRouter()
   const [loggedIn, setLoggedIn] = useState(false)
   const [initial, setInitial] = useState('?')
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
@@ -20,11 +22,12 @@ export function Nav() {
       if (session) {
         const { data } = await supabase
           .from('profiles')
-          .select('full_name')
+          .select('full_name, avatar_url')
           .eq('id', session.user.id)
           .single()
         const name = data?.full_name?.trim()
         setInitial(name ? name[0].toUpperCase() : session.user.email?.[0].toUpperCase() ?? '?')
+        if (data?.avatar_url) setAvatarUrl(data.avatar_url)
       }
     })
 
@@ -60,10 +63,14 @@ export function Nav() {
               <NavLink href="/members" current={pathname === '/members'}>Members</NavLink>
               <Link
                 href="/account"
-                className="w-7 h-7 rounded-full bg-[var(--muted)] border border-[var(--border)] flex items-center justify-center text-[10px] font-semibold text-[var(--muted-foreground)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors"
+                className="w-7 h-7 rounded-full overflow-hidden bg-[var(--muted)] border border-[var(--border)] flex items-center justify-center text-[10px] font-semibold text-[var(--muted-foreground)] hover:border-[var(--accent)] transition-colors flex-shrink-0"
                 title="Account settings"
               >
-                {initial}
+                {avatarUrl ? (
+                  <Image src={avatarUrl} alt="avatar" width={28} height={28} className="object-cover w-full h-full" unoptimized />
+                ) : (
+                  initial
+                )}
               </Link>
               <button
                 onClick={handleSignOut}
