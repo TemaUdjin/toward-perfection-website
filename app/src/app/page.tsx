@@ -184,7 +184,7 @@ function HeroOverlay() {
         <p className="text-[var(--accent)] text-[13px] sm:text-xs font-semibold tracking-[0.3em] uppercase mb-10 sm:mb-12">
           A practice system
         </p>
-        <h1 className="text-[clamp(3.25rem,12vw,8rem)] font-bold leading-[0.92] tracking-[-0.03em] mb-8 sm:mb-10 text-white drop-shadow-[0_2px_32px_rgba(0,0,0,0.7)]">
+        <h1 className="text-[clamp(4rem,12vw,8rem)] font-bold leading-[0.92] tracking-[-0.03em] mb-8 sm:mb-10 text-white drop-shadow-[0_2px_32px_rgba(0,0,0,0.7)]">
           Toward<br />
           <span className="text-[var(--accent)]">Perfection</span>
         </h1>
