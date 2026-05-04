@@ -9,7 +9,9 @@ export const metadata: Metadata = {
   title: 'Toward Perfection',
   description: 'A system of conscious body control. Strength. Mobility. Awareness.',
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+    ],
   },
 }
 
