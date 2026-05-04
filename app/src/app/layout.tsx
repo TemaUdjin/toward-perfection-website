@@ -8,6 +8,9 @@ const geist = Geist({ subsets: ['latin'], variable: '--font-geist-sans' })
 export const metadata: Metadata = {
   title: 'Toward Perfection',
   description: 'A system of conscious body control. Strength. Mobility. Awareness.',
+  icons: {
+    icon: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
